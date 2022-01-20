@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,20 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_auth',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
-    'allauth.socialaccount',
-    'rest_auth',
-    'rest_auth.registration',
-    'django_rest_passwordreset',
-    'django_filters',
-    'corsheaders',
-    
     'user',
+    
+    
 ]
 
 SITE_ID = 1
@@ -134,16 +129,30 @@ AUTH_USER_MODEL = 'user.User'
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# STATICFILES_ROOT = os.path.join(BASE_DIR, 'static_root')
+STATICFILES_DIRS = (     os.path.join(BASE_DIR, 'STATIC_ROOT'), )
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True   
+ACCOUNT_USERNAME_REQUIRED = False
 
 # rest frame work setup 
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'brijeshrajbhar361@gmail.com'
+EMAIL_HOST_PASSWORD = 'brijesh@123'  # add password here
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'brijeshrajbhar361@gmail.com'
 
 AUTHENTICATION_BACKENDS = (
  "django.contrib.auth.backends.ModelBackend",

@@ -18,18 +18,14 @@ from django.urls import path,include,re_path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.generic import TemplateView
-
+# from django.contrib import auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_auth.urls')),
-    path('api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
-    path('rest-auth/registration/', include('rest_auth.registration.urls')),
-    path('rest-auth/password_reset_confirm/<uidb64>/<token>/',
-        TemplateView.as_view(template_name="password_reset_confirm.html"),
-        name='password_reset_confirm'),
+    path('registration/', include('rest_auth.registration.urls')),
     path('user/',include('user.urls')),
- 
+    
 ]
 
 urlpatterns += static(settings.MEDIA_URL,

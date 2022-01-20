@@ -30,7 +30,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_active=models.BooleanField(default=True)
-
+    otp = models.IntegerField(null=True,blank=True)
+    activation_key = models.CharField(max_length=150,blank=True,null=True)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
