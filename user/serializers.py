@@ -18,8 +18,13 @@ class UserDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('username','email','fullname', 'mobile','gender','country','state','address1','pincode','land_mark','is_active')
+        
+class UserUpdateSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = User
+        fields = ('username','email','fullname', 'mobile','gender','country','state','address1','pincode','land_mark')
 
 class CustomRegisterSerializer(RegisterSerializer):
     is_customer = serializers.BooleanField()
@@ -74,3 +79,22 @@ class TokenSerializer(serializers.ModelSerializer):
             'is_admin': is_admin,
             'is_staff': is_staff,
         }
+        
+        
+class RollDataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Rolls
+        fields = ('roll','details','add_date')
+        
+class RollDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Rolls
+        fields = ('roll','details','add_date','modify_date')
+        
+class RollUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Rolls
+        fields = ('roll','details','add_date','active')
