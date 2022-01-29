@@ -25,6 +25,7 @@ urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
     path('registration/', include('rest_auth.registration.urls')),
     path('user/',include('user.urls')),
+    path('ecommerce/',include('ecommerce.urls')),
     
 ]
 
