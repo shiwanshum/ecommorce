@@ -133,24 +133,30 @@ class Bag(models.Model):
     def __str__(self):
         return str(self.id)+"  "+str(self.user)
 
-
+    class Meta:
+        verbose_name_plural = 'Bag'
  
 
 class DeliveryPincode(models.Model):
     pincode = models.IntegerField()
     available = models.BooleanField()
-
+    
+    def __str__(self):
+        return str(self.id)+"  "+str(self.pincode)
+    class Meta:
+        verbose_name_plural = 'Delivery'
 
 class Offer(models.Model):
     offer_type = models.CharField(max_length=25, choices=OFFER_TYPE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    today_rental_mrp = models.IntegerField()
     today_product_mrp = models.IntegerField()
     discount_percent = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return str(self.offer_type)+" "+str(self.id)
+    class Meta:
+        verbose_name_plural = 'Offer'
 
 class Order(models.Model):
 
@@ -173,10 +179,8 @@ class Order(models.Model):
     order_accepted = models.BooleanField(default=False)
     def __str__(self):
         return str(self.name) + "ordered" + str(self.Bag.id)
-
-    
-
-           
+    class Meta:
+        verbose_name_plural = 'Order'
         
 
 

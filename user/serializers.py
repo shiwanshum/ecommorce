@@ -60,7 +60,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         adapter.save_user(request, user, self)
         return user
 
-
+ 
 class TokenSerializer(serializers.ModelSerializer):
     user_type = serializers.SerializerMethodField()
     class Meta:
