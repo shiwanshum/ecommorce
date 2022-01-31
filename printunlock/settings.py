@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'allauth',
     'allauth.account',
+    'django_filters',
     'user',
     'ecommerce',
     
@@ -134,7 +135,7 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # STATICFILES_ROOT = os.path.join(BASE_DIR, 'static_root')
-STATICFILES_DIRS = (     os.path.join(BASE_DIR, 'STATIC_ROOT'), )
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'STATIC_ROOT'), )
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 

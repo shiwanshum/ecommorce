@@ -9,3 +9,9 @@ class ProductFilter(django_filters.FilterSet):
     class Meta:
         model = Product
         fields = ['name','product_mrp','size']
+        
+        
+class CategoriesFilter(django_filters.FilterSet):
+    class Meta:
+        model = Categories
+        fields = ['categories_name','date','active']

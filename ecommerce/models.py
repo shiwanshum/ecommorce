@@ -18,11 +18,11 @@ OFFER_TYPE = (
 
 
 
-class Category(models.Model):
+class Categories(models.Model):
     # user = models.ForeignKey('core.User', on_delete=models.PROTECT)
-    category_name = models.CharField(max_length=60)
+    categories_name = models.CharField(max_length=60)
     date = models.DateField(auto_now_add=True)
-
+    active=models.BooleanField(default=True)
     def __str__(self):
         return str(self.category_name)
 
@@ -30,10 +30,11 @@ class Category(models.Model):
         verbose_name_plural = 'Category'
 
 
-class size(models.Model):
+class Size(models.Model):
     # user = models.ForeignKey('core.User', on_delete=models.PROTECT)
     size = models.CharField(max_length=60)
     date = models.DateField(auto_now_add=True)
+    active=models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.size)
@@ -47,6 +48,7 @@ class Brand(models.Model):
     image = models.FileField(blank=True, upload_to="Ecommerce/brand", null=True)
     logo_image = models.FileField(blank=True, upload_to="Ecommerce/brand", null=True)
     date = models.DateField(auto_now_add=True)
+    active= models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.brand_name)
@@ -67,7 +69,7 @@ class Product(models.Model):
     product_image8 = models.FileField(blank=True, upload_to="Ecommerce/products", )
     product_mrp = models.IntegerField()
     color = models.CharField(max_length=20)
-    category = models.ManyToManyField("Category",blank=True)
+    categories = models.ManyToManyField("Categories",blank=True)
     brand = models.ManyToManyField("Brand",blank=True,)
     description = models.TextField(max_length=200, blank=True)
     is_stock = models.BooleanField(default=True)
@@ -75,7 +77,7 @@ class Product(models.Model):
     date = models.DateField(auto_now_add=True)
     quantity = models.IntegerField(default=0)
    # rent = models.BooleanField(default=False)
-    size = models.ForeignKey(size, on_delete=models.CASCADE,null=True, blank=True)
+    size = models.ForeignKey(Size, on_delete=models.CASCADE,null=True, blank=True)
     def __str__(self):
         return str(self.name)
 
