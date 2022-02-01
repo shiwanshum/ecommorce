@@ -46,4 +46,31 @@ urlpatterns = [
     path('brandDetail/<int:id>/',BrandDetailAPI.as_view()), # view Brand detail
 
     path('brand/<int:id>/',BrandUpdateAPI.as_view()),  # Brand update or delete
+    
+         # Review Related API
+
+    path('review/',ReviewAPIView.as_view()),  # Review create or list
+
+    # Wishlist Related API
+
+    path('addwishlist/',WishlistAPIView.as_view()),  # Review create or list
+
+    path('delete_wishlit_item/<int:id>/',MyWishlistAPIView.as_view()),  # Review create or list
+
+        # Delievery related API
+
+    path('create_delevery_pincode/',CreateDeliveryPincodeAPIView.as_view()),  # Create delievery pincode 
+
+    path('check_delevery_pincode/',CheckDeliveryPincodeAPIView.as_view()),  # Check delievery pincode 
+     
+      # Offer related APIs
+     
+    path('add_offer/',AddOfferAPIView.as_view()),  # Add offers api
+    
+    path('all_offer_user/',AllOfferAPIView.as_view()),  # All offers api Views of 
+    
+    path('all_offer_admin/',AllOfferAdminAPIView.as_view()),  # All offers api Views of admin
+    
+
+    path('offer_details/<int:id>/',OfferDetailAPIView.as_view()),  # Check offer details 
 ]

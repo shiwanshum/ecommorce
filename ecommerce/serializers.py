@@ -83,3 +83,97 @@ class BrandUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model= Brand
         fields ="__all__"
+        
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+class ReviewSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    user = serializers.ReadOnlyField(source='user.email')
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+
+
+class MyWishlistSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    user = serializers.ReadOnlyField(source='user.email')
+    product = ProductDisplaySerializer()
+
+    class Meta:
+        model = Wishlist
+        fields = '__all__'
+
+
+class WishlistSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Wishlist
+        fields = '__all__'
+
+class CheckDeliveryPincodeSerializer(serializers.ModelSerializer):
+    available = serializers.ReadOnlyField()
+    class Meta:
+        model = DeliveryPincode
+        fields = '__all__'
+
+class PincodeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DeliveryPincode
+        fields = '__all__'
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+class AddOfferSerializer(serializers.ModelSerializer):
+    today_product_mrp = serializers.ReadOnlyField()
+
+
+    class Meta:
+        model = Offer
+        fields = '__all__'
+
+
+class ViewAllOfferSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    product = ProductDisplaySerializer(read_only=True)
+    class Meta:
+        model = Offer
+        fields = '__all__'
+
+
+class OfferDetailSerializer(serializers.ModelSerializer):
+    today_product_mrp = serializers.ReadOnlyField()
+    id = serializers.ReadOnlyField()
+    product = ProductDisplaySerializer(read_only=True)
+
+    class Meta:
+        model = Offer
+        fields = '__all__'

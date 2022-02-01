@@ -24,7 +24,7 @@ class Categories(models.Model):
     date = models.DateField(auto_now_add=True)
     active=models.BooleanField(default=True)
     def __str__(self):
-        return str(self.category_name)
+        return str(self.categories_name)
 
     class Meta:
         verbose_name_plural = 'Category'
@@ -152,6 +152,7 @@ class Offer(models.Model):
     today_product_mrp = models.IntegerField()
     discount_percent = models.FloatField()
     date = models.DateField(auto_now_add=True)
+    active=models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.offer_type)+" "+str(self.id)
