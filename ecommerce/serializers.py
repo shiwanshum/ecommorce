@@ -177,3 +177,48 @@ class OfferDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
         fields = '__all__'
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+class AddToBagSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    total_amount = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Bag
+        fields = '__all__'
+
+class ViewMyBagSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    user = serializers.ReadOnlyField(source='user.email')
+    #item = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Bag
+        fields = '__all__'
+        
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['item'] = ProductNameSerializer(instance.item).data      
+
+        return rep
+
+class ProductNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product 
+        fields =  ['name','product_image1','size']
+class BagProductSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = ['name', 'product_image1', 'product_mrp']

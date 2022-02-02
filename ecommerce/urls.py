@@ -73,4 +73,17 @@ urlpatterns = [
     
 
     path('offer_details/<int:id>/',OfferDetailAPIView.as_view()),  # Check offer details 
+    
+    
+    
+    
+   # Bag related APIs
+
+    path('additem_buy/',AddtoBuyBagView.as_view()),      # add item for buy in bag
+
+    # path('additem_rent/',AddtoRentBagView.as_view()),    # add item for rent in bag
+
+    path('bag_view/', BagView.as_view()),                # view bag
+
+    path('bag_view/<int:id>/', BagUpdateView.as_view()), #  bag update or delete item
 ]

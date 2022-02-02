@@ -5,6 +5,7 @@ from rest_framework import viewsets, permissions, generics
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
 from .serializers import *
+from rest_framework.views import APIView
 from user.permissions import *
 from .models import *
 from .filter import ProductFilter,CategoriesFilter
@@ -579,3 +580,215 @@ class AllOfferAdminAPIView(ListAPIView):
     permission_classes = [IsAuthenticated,IsAdmin]
     serializer_class = ViewAllOfferSerializer
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+class BagView(ListAPIView):
+    queryset = Bag.objects.all()
+    serializer_class =ViewMyBagSerializer
+    permission_classes = [permissions.IsAuthenticated, ]
+    def list(self, request, *args, **kwargs):
+        try:
+            user = User.objects.get(id=request.user.id)
+        except ObjectDoesNotExist:
+            return Response({"DOES_NOT_EXIST": "User Does not exist"}, status=400)
+
+        queryset = self.queryset.filter(user=user,ordered=False)
+
+        if queryset.exists():
+            serializer = ViewMyBagSerializer(queryset, many=True, context={'request': request})
+            return Response(serializer.data, status=200)
+        else:
+            return Response("Cart is Empty", status=400)
+class BagUpdateView(RetrieveUpdateDestroyAPIView):
+    queryset = Bag.objects.all()
+    serializer_class =ViewMyBagSerializer#BagSerializer
+    permission_classes = [permissions.IsAuthenticated, ]
+    lookup_field='id'
+
+    def retrieve(self,request,*args,**kwargs):
+        if not(request.user.active==True):
+                return Response({"error": "Access Denied"}, status=401)
+        try:
+            instance = self.queryset.get(id=kwargs["id"])
+            print(instance.item.quantity)
+        except ObjectDoesNotExist:
+            return Response({"error": "Cart Does not exist"},status=404)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data,status=200)
+    def put(self, request, *args, **kwargs):
+
+        if not (request.user.active==True):
+            return Response({"error": "User is not a merchant"}, status=401)
+        instance = self.queryset.get(id=kwargs["id"])
+        item=instance.item
+        if not item.is_stock:
+            return Response("Out Of Stock", status=404)
+        if item.quantity-int(request.data["quantity"])<0:
+            return Response({"code": "Out_Of_Stock","error": "You Cannot Buy This Much Quantity"}, status=404)
+        
+        item.quantity=item.quantity-int(request.data['quantity'])
+        item.save()
+        #if cart item for rent
+         
+    # if cart item for buy        
+        
+        # if product in offer       
+        if Offer.objects.filter(product=item).exists():
+            offer_product = Offer.objects.get(product=item)             
+            product_mrp = offer_product.today_product_mrp
+            amount = product_mrp*int(request.data['quantity'])
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(price=amount)
+            return Response(serializer.data, status=200)
+        # IF PRODUCT NOT IN OFFER
+        else:
+            amount = item.product_mrp 
+            amount = amount*int(request.data['quantity'])
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(price=amount)
+            return Response(serializer.data, status=200)
+    def destroy(self, request, *args, **kwargs):
+        if not(request.user.active==True):
+                return Response({"error": "Access Denied"}, status=401)
+        try:
+            instance = self.queryset.get(id=kwargs["id"])
+        except ObjectDoesNotExist:
+            return Response({"error": "Does not exist"}, status=404)
+        instance.delete()
+        return Response({"Message": "Successfully Deleted"}, status=200)
+    
+    
+    
+class AddtoBuyBagView(ListCreateAPIView):
+    queryset = Bag.objects.all()
+    serializer_class = AddToBagSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+
+    def list(self, request, *args, **kwargs):
+        try:
+            user = User.objects.get(id=request.user.id)
+        except ObjectDoesNotExist:
+            return Response({"DOES_NOT_EXIST": "User Does not exist"}, status=400)
+
+        queryset = self.queryset.filter(user=user,ordered=False)
+        if queryset.exists():
+            serializer = ViewMyBagSerializer(queryset, many=True, context={'request': request})
+            return Response(serializer.data, status=200)
+        else:
+            return Response({"NO_ITEM": "Empty Bag"}, status=400)
+
+    def create(self, request, *args, **kwargs):
+        # CHECK PRODUCT
+        try:
+            item = Product.objects.get(id=self.request.data.get('item'))
+
+        except ObjectDoesNotExist:
+            return Response({"DOES_NOT_EXIST": "Product Does not exist"}, status=400)
+        # CHECK ITEM NOT ALREADY EXISTS
+        if Bag.objects.filter(item=item, user=request.user).exists():
+            return Response({"ALREADY_EXIST": "Item Already Exists in Bag"}, status=400)
+        if not item.is_stock:
+            return Response("Out Of Stock", status=404)
+        if item.quantity-int(request.data["quantity"])<0:
+            return Response({"code": "Out_Of_Stock","error": "You Cannot Buy This Much Quantity"}, status=404)
+        
+        item.quantity=item.quantity-int(request.data['quantity'])
+        item.save()
+
+        if Offer.objects.filter(product=item).exists():
+            
+            offer_product = Offer.objects.get(product=request.data.get('item'))             
+            product_mrp = offer_product.today_product_mrp
+            amount = product_mrp*int(request.data['quantity'])
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer.save(price=amount))
+            return Response(serializer.data, status=200)
+        # IF PRODUCT NOT IN OFFER
+        else:
+            amount = item.product_mrp 
+            amount = amount*int(request.data['quantity'])
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer.save(price=amount))
+            return Response(serializer.data, status=200)
+
+
+class ConfirmPaymentAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+    def post(self, request, *args, **kwargs):
+
+        if not (request.user.active==True):
+            return Response({"error": "User is not a customer"}, status=401)
+
+        razorpay_payment_id = request.data.get('razorpay_payment_id', None)
+        razorpay_order_id = request.data.get('razorpay_order_id', None)
+        razorpay_signature = request.data.get('razorpay_signature', None)
+
+        params_dict = {
+            'razorpay_payment_id': razorpay_payment_id,
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_signature': razorpay_signature
+        }
+
+        try:
+            user = User.objects.get(user=request.user)
+
+            bag = Bag.objects.get(user=user, ordered=False)
+        except:
+            return Response({"message": "No such payment data found."}, status=status.HTTP_400_BAD_REQUEST)
+
+        order = Order.objects.create(user=user, bag=bag)
+        order.name = request.data["name"]
+        order.email = request.data["email"]
+        order.phone = request.data["phone"]
+        order.address = request.data["address"]
+        order.landmark = request.data["landmark"]
+        order.city = request.data["city"]
+        order.state = request.data["state"]
+        order.pincode = request.data["pincode"]
+        order.order_accepted = True
+        order.delivery_date=datetime.today() + timedelta(days=7)
+        amount=0
+        for i in bag:
+            amount=amount+i.price
+        order.total_amount = amount
+        
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        try:
+            client.utility.verify_payment_signature(params_dict)
+        except:
+            raise Exception('Razorpay Signature Verification Failed')
+
+        bag.ordered = True
+        bag.payment_id = razorpay_payment_id
+        orderid=razorpay_order_id
+        bag.save()
+        if bag.item.count() != 0:
+            for i in bag:
+                product = Product.objects.get(id=i.item.id)
+                product.quantity = product.quantity - bag.quantity
+                if product.quantity == 0:
+                    product.is_stock = False
+                else:
+                    product.is_stock = True
+                product.save()
+        order.save()
+        user_payment = UserPayment.objects.create(user=user, order=order,paid=True,payment_date=order.order_date,amount_paid=order.total_amount)
+        user_payment.save()
+        user_orderd = OrderedBag.objects.create(user=user, name=order.name,bag=order.bag,phone=order.phone)
+        user_orderd.save()
+        if bag.item.count() != 0:
+            OrderStatus.objects.create(Order=order, ordered=True,
+                                        Tracking_Details="HHurrayy!! Your Order is successfully Placed")
+        return Response({"message": "Payment Successful.. Your Order is Placed "}, status=status.HTTP_200_OK)
