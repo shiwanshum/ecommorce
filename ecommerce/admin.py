@@ -16,3 +16,5 @@ admin.site.register(Order)
 admin.site.register(OrderStatus)
 admin.site.register(OrderedBag)
 admin.site.register(UserPayment)
+admin.site.register(Items)
+

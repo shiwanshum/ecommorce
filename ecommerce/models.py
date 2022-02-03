@@ -119,14 +119,13 @@ class Review(models.Model):
 class Bag(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now=True)
-    item = models.ForeignKey(Product, on_delete=models.CASCADE,null=True, blank=True)
+    item=models.ManyToManyField('Items')
     price = models.IntegerField(default=0)
-    quantity = models.IntegerField(default=1)
     ordered=models.BooleanField(default=False)
-    offer = models.ForeignKey('ecommerce.Offer', on_delete=models.CASCADE,null=True, blank=True)
     orderid = models.CharField(max_length=126,blank=True,null=True)
     ordered=models.BooleanField(default=False)
     payment_id = models.CharField(max_length=126,null=True,blank=True)
+    single_product = models.BooleanField(default=False,null=True,blank=True)
     #active = models.BooleanField(default=True)
 
 
@@ -137,7 +136,16 @@ class Bag(models.Model):
     class Meta:
         verbose_name_plural = 'Bag'
  
+class Items(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True,blank=True)
+    quantity = models.IntegerField(default=1)
+    offer = models.ForeignKey('ecommerce.Offer', on_delete=models.CASCADE,null=True, blank=True)
+    
 
+    def __str__(self):
+        return str(self.id)
+    class Meta:
+            verbose_name_plural = 'Items'
 class DeliveryPincode(models.Model):
     pincode = models.IntegerField()
     available = models.BooleanField()

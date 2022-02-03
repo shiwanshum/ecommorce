@@ -2,7 +2,8 @@ from rest_framework import serializers
 from .models import *
 from user.models import User
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.conf import settings
+import razorpay
 
 
 
@@ -230,3 +231,69 @@ class BagProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['name', 'product_image1', 'product_mrp']
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+class ItemsCartSerializer(serializers.ModelSerializer):
+    product = ProductDisplaySerializer(read_only=True)
+    msg = serializers.SerializerMethodField(read_only=True)
+    item_status = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = Items
+        fields = ["product","quantity","id","item_status","msg"]
+
+    def get_msg(self,obj):
+
+        if obj.product.is_stock==False:
+            return "Out Of Stock"
+        if obj.product.quantity - obj.quantity<0:
+            return "You Can't buy this much quantity"
+        return "Success"
+
+    def get_item_status(self,obj):
+
+        if obj.product.is_stock==False:
+            return "out_of_stock"
+        if obj.product.quantity - obj.quantity<0:
+            return False
+        return "in_stock"        
+
+
+
+class CartSerializer(serializers.ModelSerializer):
+    # order_id = serializers.SerializerMethodField(read_only=True)
+    user = serializers.ReadOnlyField(source='user.email')
+    price = serializers.ReadOnlyField()
+    orderid = serializers.ReadOnlyField()
+    ordered = serializers.ReadOnlyField()
+    payment_id = serializers.ReadOnlyField()
+    item=ItemsCartSerializer(read_only=True,many=True)
+    single_product=serializers.ReadOnlyField()
+    class Meta:
+        model = Bag
+        fields='__all__'
+
+    # def get_order_id(self, obj):
+
+    #     amount =obj.amount
+
+    #     if amount > 0:
+    #         client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    #         orderid = client.order.create(data={"amount": amount * 100, "currency": "INR", "payment_capture": "1"})
+    #         obj.orderid = orderid["id"]
+
+    #         obj.save()
+    #     return None
+
+
+
+

@@ -81,14 +81,13 @@ urlpatterns = [
 
     path('additem_buy/',AddtoBuyBagView.as_view()),      # add item for buy in bag
 
-    # path('additem_rent/',AddtoRentBagView.as_view()),    # add item for rent in bag
-
     path('bag_view/', BagView.as_view()),                # view bag
 
     path('bag_view/<int:id>/', BagUpdateView.as_view()), #  bag update or delete item
     
-    
-    
+    path('additem/',AddtoCartView.as_view()),
+    path('removeitem/',RemoveFromCartView.as_view()),
+    path('cartview/', CartView.as_view()),
         #order
 
     path('order_payment/',ConfirmPaymentAPIView.as_view()), # order create or payment
