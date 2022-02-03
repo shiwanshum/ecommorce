@@ -192,7 +192,10 @@ class OfferDetailSerializer(serializers.ModelSerializer):
         
 class AddToBagSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
-    total_amount = serializers.ReadOnlyField()
+    price = serializers.ReadOnlyField()
+    orderid = serializers.ReadOnlyField()
+    ordered = serializers.ReadOnlyField()
+    payment_id = serializers.ReadOnlyField()
 
     class Meta:
         model = Bag
@@ -201,6 +204,11 @@ class AddToBagSerializer(serializers.ModelSerializer):
 class ViewMyBagSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
     user = serializers.ReadOnlyField(source='user.email')
+    item = serializers.ReadOnlyField()
+    price = serializers.ReadOnlyField()
+    orderid = serializers.ReadOnlyField()
+    ordered = serializers.ReadOnlyField()
+    payment_id = serializers.ReadOnlyField()
     #item = serializers.ReadOnlyField()
 
     class Meta:

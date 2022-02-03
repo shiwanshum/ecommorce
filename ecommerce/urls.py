@@ -86,4 +86,10 @@ urlpatterns = [
     path('bag_view/', BagView.as_view()),                # view bag
 
     path('bag_view/<int:id>/', BagUpdateView.as_view()), #  bag update or delete item
+    
+    
+    
+        #order
+
+    path('order_payment/',ConfirmPaymentAPIView.as_view()), # order create or payment
 ]

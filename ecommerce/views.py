@@ -1,4 +1,5 @@
 from cgitb import lookup
+from itertools import product
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from rest_framework import viewsets, permissions, generics
@@ -614,18 +615,17 @@ class BagUpdateView(RetrieveUpdateDestroyAPIView):
     lookup_field='id'
 
     def retrieve(self,request,*args,**kwargs):
-        if not(request.user.active==True):
+        if not(request.user.is_active==True):
                 return Response({"error": "Access Denied"}, status=401)
         try:
             instance = self.queryset.get(id=kwargs["id"])
-            print(instance.item.quantity)
+            # print(instance.item.quantity)
         except ObjectDoesNotExist:
             return Response({"error": "Cart Does not exist"},status=404)
         serializer = self.get_serializer(instance)
         return Response(serializer.data,status=200)
     def put(self, request, *args, **kwargs):
-
-        if not (request.user.active==True):
+        if not (request.user.is_active==True):
             return Response({"error": "User is not a merchant"}, status=401)
         instance = self.queryset.get(id=kwargs["id"])
         item=instance.item
@@ -634,31 +634,31 @@ class BagUpdateView(RetrieveUpdateDestroyAPIView):
         if item.quantity-int(request.data["quantity"])<0:
             return Response({"code": "Out_Of_Stock","error": "You Cannot Buy This Much Quantity"}, status=404)
         
-        item.quantity=item.quantity-int(request.data['quantity'])
-        item.save()
-        #if cart item for rent
+        # item.quantity=item.quantity-int(request.data['quantity'])
+        # item.save()
          
     # if cart item for buy        
         
         # if product in offer       
-        if Offer.objects.filter(product=item).exists():
-            offer_product = Offer.objects.get(product=item)             
+        try:
+            offer_product = Offer.objects.get(id=request.data.get('offer') , product=item) 
             product_mrp = offer_product.today_product_mrp
             amount = product_mrp*int(request.data['quantity'])
-            serializer = self.get_serializer(data=request.data)
+            serializer = self.get_serializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save(price=amount)
             return Response(serializer.data, status=200)
         # IF PRODUCT NOT IN OFFER
-        else:
+        except:
             amount = item.product_mrp 
             amount = amount*int(request.data['quantity'])
-            serializer = self.get_serializer(data=request.data)
+            serializer = self.get_serializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save(price=amount)
             return Response(serializer.data, status=200)
+        
     def destroy(self, request, *args, **kwargs):
-        if not(request.user.active==True):
+        if not(request.user.is_active==True):
                 return Response({"error": "Access Denied"}, status=401)
         try:
             instance = self.queryset.get(id=kwargs["id"])
@@ -702,33 +702,162 @@ class AddtoBuyBagView(ListCreateAPIView):
         if item.quantity-int(request.data["quantity"])<0:
             return Response({"code": "Out_Of_Stock","error": "You Cannot Buy This Much Quantity"}, status=404)
         
-        item.quantity=item.quantity-int(request.data['quantity'])
-        item.save()
+        # item.quantity=item.quantity-int(request.data['quantity'])
+        # item.save()
 
-        if Offer.objects.filter(product=item).exists():
-            
-            offer_product = Offer.objects.get(product=request.data.get('item'))             
+        try:
+            offer_product = Offer.objects.filter(id=request.data.get('offer'),product=request.data.get('item'))             
             product_mrp = offer_product.today_product_mrp
             amount = product_mrp*int(request.data['quantity'])
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer.save(price=amount))
-            return Response(serializer.data, status=200)
+            return Response({"Msg": "Product Added"}, status=200)
+
         # IF PRODUCT NOT IN OFFER
-        else:
+        except:
             amount = item.product_mrp 
             amount = amount*int(request.data['quantity'])
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer.save(price=amount))
-            return Response(serializer.data, status=200)
+            return Response({"Msg": "Product Added"}, status=200)
+
+
+
+
+class AddtoCartView(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+    def post(self, request):
+        try:
+            product = Product.objects.get(id=request.data['product_id'])
+            if not product.is_stock:
+                return Response("Out Of Stock", status=404)
+            if product.quantity-request.data['quantity']<0:
+                return Response("You Cannot Buy this much quantity", status=404)
+            quantity = request.data['quantity']
+            # offer = request.data['offer']
+            item = Items.objects.create(product=product, quantity=quantity)
+            item.offer=request.data['offer'] if request.data['offer'] else None
+            item.save()
+        except ObjectDoesNotExist:
+            return Response("Wrong Product Id", status=404)
+        if request.user.is_active == True:
+            user = User.objects.get(id=request.user.id)
+        
+            bag = Bag.objects.filter(user=user, ordered=False,single_product=False)
+            if bag.exists():
+                bag = bag[0]
+            else:
+                bag = Bag.objects.create(user=user, ordered=False,single_product=False)
+        bag.item.add(item)
+        try:
+            product_mrp = item.offer.today_product_mrp
+            price = product_mrp*item.quantity
+        except:
+            product_mrp = item.product.product_mrp 
+            price = product_mrp*item.quantity
+        # try:
+        #     offer_product = Offer.objects.filter(id=request.data['offer'],product=product) 
+        #     product_mrp = offer_product.today_product_mrp
+        #     price = product_mrp*int(request.data['quantity'])
+        # except:
+        #     price = product.product_mrp 
+        #     price = price*int(request.data['quantity'])
+        bag.price = bag.price + price
+        bag.save()
+        return Response({"Msg": "Product Added"}, status=200)
+
+# class CartView(RetrieveUpdateAPIView):
+#     queryset = Bag.objects.all()
+#     serializer_class = CartSerializer
+#     permission_classes = [permissions.IsAuthenticated, ]
+#     def retrieve(self, request, *args, **kwargs):
+
+#         # if not request.user.is_merchant or request.user.is_webuser:
+#         #     return Response({"error": "User is not a merchant"}, status=401)
+#         source = self.request.query_params.get('source', None)
+
+#         if request.user.is_active == True:
+#             user = User.objects.get(id=request.user.id)
+#         # else:
+#         #     cust = Customer.objects.get(user=request.user)
+#         bag = Bag.objects.filter(user=user, ordered=False,single_product=False)
+#         if bag.exists():
+#             bag = bag[0]
+#         else:
+#             return Response("No Active cart", status=404)
+#         serializer = self.get_serializer(bag)
+
+#         return Response(serializer.data, status=200)
+
+#     def partial_update(self, request, *args, **kwargs):
+#         # if not request.user.is_customer or request.user.is_webuser:
+#         #     return Response({"error": "Access Denied"}, status=401)
+#         if request.user.is_active == True:
+#             user = User.objects.get(id=request.user.id)
+#         # else:
+#         #     cust = Customer.objects.get(user=request.user)
+#         try:
+#             instance = self.queryset.get(user=user, ordered=False,single_product=False)
+#         except ObjectDoesNotExist:
+#             return Response({"error": "Cart Does not exist"}, status=404)
+#         item = Items.objects.get(id=request.data["item"])
+#         if request.data['todo'] == "add":
+#             if(item.quantity>=item.product.quantity):
+#                 return Response({"error": "Cann't add this much quantity"}, status=404)
+#             item.quantity = item.quantity + 1
+#             instance.amount=instance.amount + item.product.price
+#         elif request.data['todo'] == "remove":
+#             if item.quantity == 1:
+#                 Response({"error": "You Have to Remove the product"}, status=404)
+#             item.quantity = item.quantity - 1
+#             instance.amount = instance.amount - item.product.price
+#         item.save()
+#         instance.save()
+
+#         serializer = BagSerializer(instance)
+#         return Response(serializer.data, status=200)
+
+class RemoveFromCartView(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+    def post(self, request):
+
+        if request.user.is_active == True:
+            user = User.objects.get(id=request.user.id)
+        bag = Bag.objects.filter(user=user, ordered=False,single_product=False)
+        if bag.exists():
+            bag = bag[0]
+        else:
+            return Response("No Active cart", status=404)
+        try:
+            item = Items.objects.get(id=request.data["item"])
+        except ObjectDoesNotExist:
+            return Response("Item doesnt exist", status=404)
+        try:
+            product_mrp = item.offer.today_product_mrp
+            price = product_mrp*item.quantity
+        except:
+            product_mrp = item.product.product_mrp 
+            price = product_mrp*item.quantity
+        bag.price = bag.price - price #item.product.product_mrp*item.quantity
+        bag.item.remove(item)
+        item.delete()
+        bag.save()
+        return Response({"Msg": " Removed"}, status=200)
+
+
+
+
+
+
 
 
 class ConfirmPaymentAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated, ]
     def post(self, request, *args, **kwargs):
 
-        if not (request.user.active==True):
+        if not (request.user.is_active==True):
             return Response({"error": "User is not a customer"}, status=401)
 
         razorpay_payment_id = request.data.get('razorpay_payment_id', None)
@@ -772,7 +901,7 @@ class ConfirmPaymentAPIView(APIView):
 
         bag.ordered = True
         bag.payment_id = razorpay_payment_id
-        orderid=razorpay_order_id
+        bag.orderid=razorpay_order_id
         bag.save()
         if bag.item.count() != 0:
             for i in bag:
