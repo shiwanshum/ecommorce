@@ -737,21 +737,26 @@ class AddtoCartView(APIView):
                 return Response("Out Of Stock", status=404)
             if product.quantity-request.data['quantity']<0:
                 return Response("You Cannot Buy this much quantity", status=404)
+            user = User.objects.get(id=request.user.id)
+            bag = Bag.objects.filter(user=user, ordered=False,single_product=False)
+            if Bag.objects.filter(user=user, ordered=False,single_product=False).exists() and Items.objects.filter(product=request.data['product_id'], bag=bag[0]).exists():
+                return Response({"ALREADY_EXIST": "Item Already Exists in Bag"}, status=400)
             quantity = request.data['quantity']
             # offer = request.data['offer']
             item = Items.objects.create(product=product, quantity=quantity)
-            item.offer=request.data['offer'] if request.data['offer'] else None
+            try:
+               item.offer= Offer.objects.get(id=request.data['offer']) 
+               print(item.offer)
+            except:
+                item.offer=None
+                print(item.offer)
             item.save()
         except ObjectDoesNotExist:
             return Response("Wrong Product Id", status=404)
-        if request.user.is_active == True:
-            user = User.objects.get(id=request.user.id)
-        
-            bag = Bag.objects.filter(user=user, ordered=False,single_product=False)
-            if bag.exists():
-                bag = bag[0]
-            else:
-                bag = Bag.objects.create(user=user, ordered=False,single_product=False)
+        if bag.exists():
+            bag = bag[0]
+        else:
+            bag = Bag.objects.create(user=user, ordered=False,single_product=False)
         bag.item.add(item)
         try:
             if item.offer!=None:

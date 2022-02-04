@@ -79,7 +79,7 @@ class Product(models.Model):
    # rent = models.BooleanField(default=False)
     size = models.ForeignKey(Size, on_delete=models.CASCADE,null=True, blank=True)
     def __str__(self):
-        return str(self.name)
+        return str(self.id)+" "+str(self.name)
 
     class Meta:
         verbose_name_plural = 'Products'
@@ -119,7 +119,7 @@ class Review(models.Model):
 class Bag(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now=True)
-    item=models.ManyToManyField('Items')
+    item=models.ManyToManyField('ecommerce.Items',verbose_name=('Items'),default=None,blank=True)
     price = models.IntegerField(default=0)
     ordered=models.BooleanField(default=False)
     orderid = models.CharField(max_length=126,blank=True,null=True)
@@ -143,7 +143,7 @@ class Items(models.Model):
     
 
     def __str__(self):
-        return str(self.id)
+        return str(self.id)+" "+str(self.product.name)
     class Meta:
             verbose_name_plural = 'Items'
 class DeliveryPincode(models.Model):
