@@ -26,7 +26,18 @@ urlpatterns = [
 
     path('categories/<int:id>/',CategoriesUpdateAPI.as_view()),  # Categories update or delete
     
-    
+
+    # Subcategories Related APIs
+
+    path('subcategories/',AllSubcategoriesView.as_view()),           # view all Subcategories 
+
+    path('subcategories_create/', SubcategoriesCreate.as_view()),    # create Subcategories here
+
+    path('subcategoriesDetail/<int:id>/',SubcategoriesDetailAPI.as_view()), # view Subcategories detail
+
+    path('subcategories/<int:id>/',SubcategoriesUpdateAPI.as_view()),  # Subcategories update or delete
+
+
         # Size Related APIs
 
     path('size/',AllSizeView.as_view()),           # view all Sizes 

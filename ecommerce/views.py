@@ -9,7 +9,7 @@ from .serializers import *
 from rest_framework.views import APIView
 from user.permissions import *
 from .models import *
-from .filter import ProductFilter,CategoriesFilter
+from .filter import ProductFilter,CategoriesFilter,SubcategoriesFilter
 from user.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import *
@@ -34,7 +34,7 @@ class AllProductView(ListAPIView):
     queryset = Product.objects.filter(is_active=True)
     search_fields = ["name","brand"]
     filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]
-    ordering_fields = ['name','categories','color','product_mrp',]
+    ordering_fields = ['name','categories','subcategories','color','product_mrp',]
     filterset_class = ProductFilter
     serializer_class = ProductDisplaySerializer
     lookup_field='id'
@@ -215,7 +215,97 @@ class CategoriesUpdateAPI(RetrieveUpdateDestroyAPIView):
         return Response({"Message": "Successfully Deleted"}, status=200)
     
     
+####################################################################################
+class SubcategoriesPagination(PageNumberPagination):       
+       page_size = 10
 
+class AllSubcategoriesView(ListAPIView):
+
+    queryset = Subcategories.objects.all()
+    search_fields = ["subcategory"]
+    filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ['subcategory','date','active']
+    filterset_class = SubcategoriesFilter
+    serializer_class = CategoriesDisplaySerializer
+    lookup_field='id'
+    pagination_class = SubcategoriesPagination
+    
+
+class SubcategoriesCreate(CreateAPIView):
+
+    queryset = Subcategories.objects.all()
+    serializer_class = SubcategoriesCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self,request):
+
+        if not(request.user.is_admin==True):
+                return Response({"error": "Access Denied"}, status=401)
+            
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=200)
+
+
+class SubcategoriesDetailAPI(RetrieveAPIView):
+
+    queryset = Subcategories.objects.all()
+    serializer_class = SubcategoriesUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id'
+
+    def retrieve(self,request,*args,**kwargs):
+        if not(request.user.is_admin==True):
+                return Response({"error": "Access Denied"}, status=401)
+        try:
+            instance = self.queryset.get(id=kwargs["id"])
+        except ObjectDoesNotExist:
+            return Response({"error":"Does not exist"},status=404)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data,status=200)
+
+
+class SubcategoriesUpdateAPI(RetrieveUpdateDestroyAPIView):
+
+    queryset = Subcategories.objects.all()
+    serializer_class = SubcategoriesUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id'
+
+    def retrieve(self,request,*args,**kwargs):
+        if not(request.user.is_admin==True):
+                return Response({"error": "Access Denied"}, status=401)
+        try:
+            instance = self.queryset.get(id=kwargs["id"])
+        except ObjectDoesNotExist:
+            return Response({"error":"Does not exist"},status=404)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data,status=200)
+
+    def partial_update(self, request, *args, **kwargs):
+        if not(request.user.is_admin==True):
+                return Response({"error": "Access Denied"}, status=401)
+        try:
+            instance = self.queryset.get(id=kwargs["id"])
+        except ObjectDoesNotExist:
+            return Response({"error": "Does not exist"}, status=404)
+
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=200)
+
+    def destroy(self, request, *args, **kwargs):
+        if not(request.user.is_admin==True):
+                return Response({"error": "Access Denied"}, status=401)
+        try:
+            instance = self.queryset.get(id=kwargs["id"])
+        except ObjectDoesNotExist:
+            return Response({"error": "Does not exist"}, status=404)
+        instance.active=False
+        instance.save()
+        return Response({"Message": "Successfully Deleted"}, status=200)
 
 class AllSizeView(ListAPIView):
 

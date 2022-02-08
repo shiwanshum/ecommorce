@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from user.models import *
 import datetime
 
@@ -27,8 +28,19 @@ class Categories(models.Model):
         return str(self.categories_name)
 
     class Meta:
-        verbose_name_plural = 'Category'
+        verbose_name_plural = 'Categories'
 
+class Subcategories(models.Model):
+    # user = models.ForeignKey('core.User', on_delete=models.PROTECT)
+    subcategory = models.CharField(max_length=50, unique=True, null=False, blank=False)
+    categories_name = models.ForeignKey(Categories, on_delete=models.CASCADE,default=None,blank=True)
+    date = models.DateField(auto_now_add=True)
+    active=models.BooleanField(default=True)
+    def __str__(self):
+        return str(self.id)+" "+str(self.subcategory)
+
+    class Meta:
+        verbose_name_plural = 'Subcategories'
 
 class Size(models.Model):
     # user = models.ForeignKey('core.User', on_delete=models.PROTECT)
@@ -69,8 +81,9 @@ class Product(models.Model):
     product_image8 = models.FileField(blank=True, upload_to="Ecommerce/products", )
     product_mrp = models.IntegerField()
     color = models.CharField(max_length=20)
-    categories = models.ManyToManyField("Categories",blank=True)
-    brand = models.ManyToManyField("Brand",blank=True,)
+    categories = models.OneToOneField(Categories,on_delete=models.CASCADE,blank=True)
+    subcategories = models.OneToOneField(Subcategories,on_delete=models.CASCADE,blank=True)
+    brand = models.ForeignKey(Brand,blank=True,on_delete=models.CASCADE)
     description = models.TextField(max_length=200, blank=True)
     is_stock = models.BooleanField(default=True)
     is_active = models.BooleanField(default=False)
@@ -98,7 +111,7 @@ class Wishlist(models.Model):
 
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True, blank=True)
     image1 = models.FileField(blank=True, upload_to="Ecommerce/reviews", null=True)
     image2 = models.FileField(blank=True, upload_to="Ecommerce/reviews", null=True)
@@ -117,7 +130,7 @@ class Review(models.Model):
 
 
 class Bag(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now=True)
     item=models.ManyToManyField('ecommerce.Items',verbose_name=('Items'),default=None,blank=True)
     price = models.IntegerField(default=0)
@@ -170,7 +183,7 @@ class Offer(models.Model):
 
 class Order(models.Model):
 
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey('user.User',on_delete=models.CASCADE)
     name = models.CharField(max_length=50,null=True,blank=True)
     email = models.EmailField(max_length=34,null=True,blank=True)
     phone = models.CharField(max_length = 13,null=True,blank=True)
@@ -211,7 +224,7 @@ class OrderStatus(models.Model):
 
 class UserPayment(models.Model):
 
-    user=models.ForeignKey(User, on_delete=models.CASCADE)
+    user=models.ForeignKey('user.User', on_delete=models.CASCADE)
     amount_paid=models.IntegerField(default=0)
     payment_date=models.DateField(null=True,blank=True)
     invoice=models.FileField(upload_to='User/payment/invoice',null=True,blank=True)

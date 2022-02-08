@@ -25,25 +25,39 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 class ProductDisplaySerializer(serializers.ModelSerializer):
     class Meta:
         model= Product
-        fields = ["name","product_image1","product_image2","product_image3","product_image4","product_image5","product_image6","product_image7","product_image8","product_mrp","size","is_stock","id","brand","categories","product_mrp"]
+        fields = ["name","product_image1","product_image2","product_image3","product_image4","product_image5","product_image6","product_image7","product_image8","product_mrp","size","is_stock","id","brand","categories","subcategories","product_mrp"]
 
 
 class CategoriesDisplaySerializer(serializers.ModelSerializer):
     class Meta:
         model= Categories
         fields =["categories_name","active"]
-        
-        
+
 class CategoriesCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model= Categories
         exclude=['active']
         
         
-        
 class CategoriesUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model= Categories
+        fields ="__all__"
+class SubcategoriesDisplaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model= Subcategories
+        fields =["subcategory","active"]    
+        
+class SubcategoriesCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= Subcategories
+        exclude=['active']
+        
+        
+        
+class SubcategoriesUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= Subcategories
         fields ="__all__"
         
         

@@ -4,6 +4,7 @@ from . models import *
 # Register your models here.
 
 admin.site.register(Categories)
+admin.site.register(Subcategories)
 admin.site.register(Size)
 admin.site.register(Brand)
 admin.site.register(Product)
