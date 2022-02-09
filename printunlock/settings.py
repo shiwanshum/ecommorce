@@ -138,7 +138,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # STATICFILES_ROOT = os.path.join(BASE_DIR, 'static_root')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'STATIC_ROOT'), )
-
+DISABLE_COLLECTSTATIC=1
 CLOUDINARY_STORAGE= { 
   'CLOUD_NAME' : 'brijesh123', 
   'API_KEY' : '539741726149736', 
