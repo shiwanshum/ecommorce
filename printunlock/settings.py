@@ -132,7 +132,7 @@ AUTH_USER_MODEL = 'user.User'
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_ROOT = os.path.join(BASE_DIR, 'static_root')
@@ -140,15 +140,14 @@ STATICFILES_ROOT = os.path.join(BASE_DIR, 'static_root')
 
 
 
-# DISABLE_COLLECTSTATIC=1
-# CLOUDINARY_STORAGE= { 
-#   'CLOUD_NAME' : 'brijesh123', 
-#   'API_KEY' : '539741726149736', 
-#   'API_SECRET' : 'U8o7wVv3GXtBHEHAXnL7dVkC4m0' 
-# }
-# CLOUDINARY = {
-#     'max_length': 200,
-# }
+CLOUDINARY_STORAGE= { 
+  'CLOUD_NAME' : 'brijesh123', 
+  'API_KEY' : '539741726149736', 
+  'API_SECRET' : 'U8o7wVv3GXtBHEHAXnL7dVkC4m0' 
+}
+CLOUDINARY = {
+    'max_length': 200,
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
