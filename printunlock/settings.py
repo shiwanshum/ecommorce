@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import os
 import django_heroku
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -46,8 +47,7 @@ INSTALLED_APPS = [
     'django_filters',
     'user',
     'ecommerce',
-    
-    
+    'cloudinary',
 ]
 
 SITE_ID = 1
@@ -139,11 +139,10 @@ STATICFILES_ROOT = os.path.join(BASE_DIR, 'static_root')
 
 
 
-
 CLOUDINARY_STORAGE= { 
-  'CLOUD_NAME' : 'brijesh123', 
-  'API_KEY' : '539741726149736', 
-  'API_SECRET' : 'U8o7wVv3GXtBHEHAXnL7dVkC4m0' 
+  'CLOUD_NAME' : 'brijesh1234', 
+  'API_KEY' : '268927187694494', 
+  'API_SECRET' : 'HSGFHWFfLB_7WmZXdqTBbZGb_bc' 
 }
 CLOUDINARY = {
     'max_length': 200,
