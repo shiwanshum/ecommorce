@@ -28,7 +28,8 @@ urlpatterns = [
     
 
     # Subcategories Related APIs
-
+    path('getsubcategorys/<int:id>/',Get_subcategorysAPIView.as_view()), # view related subcategories detail
+    
     path('subcategories/',AllSubcategoriesView.as_view()),           # view all Subcategories 
 
     path('subcategories_create/', SubcategoriesCreate.as_view()),    # create Subcategories here

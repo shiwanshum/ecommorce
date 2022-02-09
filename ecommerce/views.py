@@ -1,5 +1,6 @@
 from cgitb import lookup
 from itertools import product
+from unicodedata import category
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from rest_framework import viewsets, permissions, generics
@@ -216,6 +217,24 @@ class CategoriesUpdateAPI(RetrieveUpdateDestroyAPIView):
     
     
 ####################################################################################
+
+
+class Get_subcategorysAPIView(ListAPIView):
+    queryset = Subcategories.objects.all()
+    serializer_class = SubcategoriesUpdateSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id'
+
+    def list(self, request, *args, **kwargs):
+        
+        queryset = self.queryset.filter(categories_name=kwargs["id"])
+        if queryset.exists():
+            serializer = SubcategoriesUpdateSerializer(queryset, many=True, context={'request': request})
+            return Response(serializer.data, status=200)
+        else:
+            return Response({"NO Subcategory": "In This Category no subcategory is available"}, status=400)
+
+
 class SubcategoriesPagination(PageNumberPagination):       
        page_size = 10
 
