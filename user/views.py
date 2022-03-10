@@ -9,6 +9,12 @@ from .serializers import *
 from datetime import datetime, timedelta,date
 from rest_framework.generics import *
 
+from django.http import HttpResponse
+
+def empty_view(request):
+    print(request)
+    print('sdhgfjdgskjfgsjdgfjadgsf')
+    return HttpResponse('')
 class UserListAPIView(ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserDataSerializer

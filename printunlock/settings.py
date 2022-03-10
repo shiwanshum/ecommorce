@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 from pathlib import Path
 import os
-import django_heroku
+# import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -157,20 +157,19 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 
 # rest frame work setup 
+AUTH_USER_MODEL = 'user.User'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'brijeshrajbhar361@gmail.com'
-EMAIL_HOST_PASSWORD = 'brijesh@123'  # add password here
-EMAIL_USE_SSL = False
-DEFAULT_FROM_EMAIL = 'brijeshrajbhar361@gmail.com'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'brijeshrajbhar361@gmail.com'
+# EMAIL_HOST_PASSWORD = 'brijesh@123'  # add password here
+# EMAIL_USE_SSL = False
+# DEFAULT_FROM_EMAIL = 'brijeshrajbhar361@gmail.com'
 
 AUTHENTICATION_BACKENDS = (
  "django.contrib.auth.backends.ModelBackend",
-
  "allauth.account.auth_backends.AuthenticationBackend",
 )
 
@@ -203,4 +202,4 @@ CORS_ORIGIN_ALLOW_ALL = True
 RAZORPAY_KEY_ID = "rzp_test_d60JA5dzjyDyZ0"
 RAZORPAY_KEY_SECRET = "Kj6MjRcvzX30fZXfpTqhpgU0"
 CORS_ORIGIN_ALLOW_ALL = True
-django_heroku.settings(locals())
+# django_heroku.settings(locals())
