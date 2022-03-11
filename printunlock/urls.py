@@ -19,16 +19,14 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.conf.urls import url
 from django.views.generic import TemplateView
-from django.contrib.auth.views import PasswordResetView
-
+from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_auth.urls')),
     path('registration/', include('rest_auth.registration.urls')),
     path('user/',include('user.urls')),
     path('ecommerce/',include('ecommerce.urls')),
-    url(r'^', include('django.contrib.auth.urls')),
-    
+    path('reset/<uidb64>/<token>/',auth_views.PasswordResetConfirmView.as_view() ,name='password_reset_confirm'),
     
 ]
 

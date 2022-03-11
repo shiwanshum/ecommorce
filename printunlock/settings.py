@@ -158,15 +158,15 @@ ACCOUNT_USERNAME_REQUIRED = False
 
 # rest frame work setup 
 AUTH_USER_MODEL = 'user.User'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_USE_TLS = True
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'brijeshrajbhar361@gmail.com'
-# EMAIL_HOST_PASSWORD = 'brijesh@123'  # add password here
-# EMAIL_USE_SSL = False
-# DEFAULT_FROM_EMAIL = 'brijeshrajbhar361@gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'brijeshrajbhar361@gmail.com'
+EMAIL_HOST_PASSWORD = 'rajbhar@123'  # add password here
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'brijeshrajbhar361@gmail.com'
 
 AUTHENTICATION_BACKENDS = (
  "django.contrib.auth.backends.ModelBackend",
